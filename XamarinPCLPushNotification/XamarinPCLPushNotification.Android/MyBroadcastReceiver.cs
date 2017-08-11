@@ -7,8 +7,8 @@ using WindowsAzure.Messaging;
 using Java.Lang;
 using Android.Media;
 
-[assembly: Permission(Name = "com.rciapps.camobile.permission.C2D_MESSAGE")]
-[assembly: UsesPermission(Name = "com.rciapps.camobile.permission.C2D_MESSAGE")]
+[assembly: Permission(Name = "[MyPackageName].permission.C2D_MESSAGE")]
+[assembly: UsesPermission(Name = "[MyPackageName].permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "com.google.android.c2dm.permission.RECEIVE")]
 
 //GET_ACCOUNTS is needed only for Android versions 4.0.3 and below
@@ -24,15 +24,14 @@ namespace XamarinPCLPushNotification.Droid
     //You must subclass this!
     [BroadcastReceiver(Permission = Gcm.Client.Constants.PERMISSION_GCM_INTENTS)]
     [IntentFilter(new[] { Android.Content.Intent.ActionBootCompleted })] // Allow GCM on boot and when app is closed
-    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_MESSAGE }, Categories = new string[] { "com.rciapps.camobile" })]
-    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_REGISTRATION_CALLBACK }, Categories = new string[] { "com.rciapps.camobile" })]
-    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_LIBRARY_RETRY }, Categories = new string[] { "com.rciapps.camobile" })]
+    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_MESSAGE }, Categories = new string[] { "[MyPackageName]" })]
+    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_REGISTRATION_CALLBACK }, Categories = new string[] { "[MyPackageName]" })]
+    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_LIBRARY_RETRY }, Categories = new string[] { "[MyPackageName]" })]
 
 
     public class MyBroadcastReceiver : GcmBroadcastReceiverBase<PushHandlerService>
     {
-        //public static string[] SENDER_IDS = new string[] { App.client.GoogleAPISenderID };
-        public static string[] SENDER_IDS = new string[] { "517660205040" };
+        public static string[] SENDER_IDS = new string[] { "[MySenderID]" };
         public const string TAG = "MyBroadcastReceiver-GCM";
     }
 
@@ -40,29 +39,11 @@ namespace XamarinPCLPushNotification.Droid
     [Service] // Must use the service tag
     public class PushHandlerService : GcmServiceBase
     {
-        public static string RegistrationID { get; private set; }
-        private NotificationHub Hub { get; set; }
-        public static Context Context;
-
-        //public PushHandlerService() : base(App.client.GoogleAPISenderID)
-        public PushHandlerService() : base("517660205040")
-        {
-            Log.Info(MyBroadcastReceiver.TAG, "PushHandlerService() constructor");
-        }
-
-        protected override void OnRegistered(Context context, string registrationId)
-        {
-            Log.Verbose(MyBroadcastReceiver.TAG, "GCM Registered: " + registrationId);
-
-            RegistrationID = registrationId;
-
-            //RCI-Lerrie 3.16.17 doesn't need to push notify the user.
-            //createNotification("PushHandlerService-GCM Registered...",
-            //                    "The device has been Registered!");
+        public static string RegistrationID { get; private set
 
             //Hub = new NotificationHub(App.client.NotiHubPath, App.client.NotiHubConnectionStringListen,
             //                            context);
-            Hub = new NotificationHub("RCICAMobileNotificationHub", "Endpoint=sb://rcicamobilenotificationnamespace.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=JRkPcobvvJZzpw6ifQXx5czgNKXj3yjQaM33p+65wls=",
+            Hub = new NotificationHub("[MyNotificationHub]", "[MyNotificationHubListen]",
                                         context);
 
             try
@@ -83,7 +64,24 @@ namespace XamarinPCLPushNotification.Droid
             }
             catch (Exception ex)
             {
-                Log.Error(MyBroadcastReceiver.TAG, ex.Message);
+                Log.Error(MyBroadcastReceiver.TAG, ex.Message);; }
+        private NotificationHub Hub { get; set; }
+        public static Context Context;
+
+        public PushHandlerService() : base("[MySenderID]")
+        {
+            Log.Info(MyBroadcastReceiver.TAG, "PushHandlerService() constructor");
+        }
+
+        protected override void OnRegistered(Context context, string registrationId)
+        {
+            Log.Verbose(MyBroadcastReceiver.TAG, "GCM Registered: " + registrationId);
+
+            RegistrationID = registrationId;
+
+            //RCI-Lerrie 3.16.17 doesn't need to push notify the user.
+            //createNotification("PushHandlerService-GCM Registered...",
+            //                    "The device has been Registered!");
             }
         }
 
@@ -94,7 +92,7 @@ namespace XamarinPCLPushNotification.Droid
             Log.Info(MyBroadcastReceiver.TAG, "GCM Message Received!");
 
             //var title = string.Format("{0} CA Update", App.client.ClientName);
-            var title = string.Format("{0} CA Update", "RCIDEMO");
+            var title = "Update";
 
             //RCI-Lerrie 8/10/17 NEW START
             //-------------------------
