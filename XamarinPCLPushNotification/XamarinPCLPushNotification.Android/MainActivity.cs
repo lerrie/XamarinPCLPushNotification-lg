@@ -46,8 +46,7 @@ namespace XamarinPCLPushNotification.Droid
 
                 PushHandlerService.Context = this;
 
-                //GcmClient.Register(this, App.client.GoogleAPISenderID);
-                GcmClient.Register(this, "517660205040");
+                GcmClient.Register(this, [MySenderID]);
 
 
 
